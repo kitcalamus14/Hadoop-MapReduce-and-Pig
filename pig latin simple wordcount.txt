@@ -1,0 +1,18 @@
+A = LOAD '/user/maria_dev/scrapped1' USING PigStorage(',')
+AS(date:chararray, country:chararray, title:chararray,description:chararray);
+B = RANK A;
+C = FILTER B by $0>1;
+
+D = FOREACH C GENERATE CONCAT (title, description)
+AS(mix:chararray);
+
+words = foreach D generate flatten(TOKENIZE(mix)) as word;
+
+
+grpd = group words by word;
+
+
+cntd = foreach grpd generate group, COUNT(words);
+
+
+dump cntd;
